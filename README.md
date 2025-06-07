@@ -1,54 +1,161 @@
-# -McDonalds-Healthier-Alternative-Recommendation
+# 🍔 McDonald's Healthier Alternative Recommendation System
 
-1. Healthier Alternatives: (Using ML - KNN)
-Method: K-Nearest Neighbors (KNN) is used here.
+**An ML + NLP + DL-powered approach to suggesting better food choices**
 
-Explanation: KNN is a classical machine learning algorithm used for finding items that are "nearest" to the selected food item based on certain features—in this case, nutritional information (protein and fat).
+---
 
-How it works:
+## 🧠 Overview
 
-You select a McDonald's food item (e.g., Spicy Chicken Wrap), and its nutritional information (protein and fat content) is scaled and transformed.
+**McDonalds-Healthier-Alternative-Recommendation** is a hybrid machine learning and deep learning project designed to suggest **healthier alternatives** to popular McDonald’s menu items. It uses a combination of:
 
-The KNN algorithm finds the top 3 food items from the Daily Food & Nutrition dataset that are most similar in terms of protein and fat content.
+* **K-Nearest Neighbors (KNN)** for nutritional similarity,
+* **TF-IDF + Cosine Similarity** for name-based similarity,
+* **BERT** for healthiness classification from food descriptions.
 
-The system suggests food items that are healthier alternatives based on the nutritional similarity (although these may not always be the healthiest options, they are nutritionally similar).
+By combining these AI techniques, this system provides smarter food alternatives—balancing taste familiarity with nutritional improvement.
 
-Result: In your case, it suggests Nuts, Milkshake, and Coffee as healthier alternatives, based on similar protein and fat content.
+---
 
-2. NLP-Based Similar Food Items: (Using NLP - Cosine Similarity with TF-IDF)
-Method: TF-IDF (Term Frequency-Inverse Document Frequency) for text-based similarity and Cosine Similarity for comparing the similarity of food item names.
+## 🔍 Problem Statement
 
-Explanation: Here, Natural Language Processing (NLP) techniques are used to find food items that have similar names or descriptions.
+Fast food is convenient, but not always healthy. The goal of this project is to:
 
-TF-IDF vectorizes the food item names from both McDonald's and the Daily Food datasets, which helps to transform the textual data (food item names) into numerical form.
+1. Recommend similar food items based on **nutrition** (e.g., protein and fat).
+2. Recommend similar items based on **name/description** (textual similarity).
+3. **Classify** whether a food item is *healthy* or *unhealthy* based on its description.
 
-Cosine Similarity measures how similar two text vectors (food item names) are, based on their "distance" in a high-dimensional space. The cosine similarity score is between 0 and 1 (where 1 means identical).
+---
 
-This technique doesn’t consider the nutritional content but looks for items with similar names or keywords in the dataset.
+## 🛠️ Techniques Used
 
-Result: For your selected item "Spicy Chicken Wrap", the similar items found by the model are Tomato, Banana, and Oats based on the text-based similarity of their names.
+### 1️⃣ **Nutritional Similarity with KNN (ML)**
 
-3. Predicted Healthiness: (Using DL - BERT for Sequence Classification)
-Method: BERT (Bidirectional Encoder Representations from Transformers) for sequence classification (using a pre-trained model for text classification).
+* **Algorithm**: K-Nearest Neighbors (KNN)
+* **Features Used**: `protein`, `fat` (normalized and scaled)
+* **Goal**: Find top-k items from a healthy food database that are closest in nutritional profile to a McDonald’s item.
+* **Result**: Suggests 3 nearest matches, e.g., for *Spicy Chicken Wrap*, alternatives might be: `Nuts`, `Milkshake`, and `Coffee`.
 
-Explanation: BERT, a state-of-the-art deep learning model for Natural Language Processing (NLP), is used here to classify whether a given food item is healthy or unhealthy. This model is trained on textual data and can perform tasks like sentiment analysis, classification, and more.
+---
 
-In your case, BERT classifies the Spicy Chicken Wrap as unhealthy or healthy based on its description.
+### 2️⃣ **Textual Similarity with TF-IDF + Cosine Similarity (NLP)**
 
-The BERT model is fine-tuned on labeled data (e.g., healthy or unhealthy), which means it has been trained to predict these labels based on the food item descriptions.
+* **Technique**:
 
-Result: For Spicy Chicken Wrap, the model predicts Unhealthy.
+  * TF-IDF Vectorizer to encode food item names
+  * Cosine Similarity to compare text embeddings
+* **Goal**: Suggest food items with **similar names** or descriptions (e.g., user searches for “Chicken Wrap”, system suggests “Banana Wrap” or “Spiced Oats”).
+* **Limitation**: Does *not* consider nutrition, only text similarity.
+* **Result**: For *Spicy Chicken Wrap*, results might be: `Tomato`, `Banana`, and `Oats`.
 
-Breakdown of Each Part in the Flow:
-KNN (ML): Finds healthier alternatives based on nutritional similarities (protein and fat content).
+---
 
-TF-IDF + Cosine Similarity (NLP): Finds text-based similar food items by comparing food item names.
+### 3️⃣ **Healthiness Classification with BERT (DL)**
 
-BERT (DL): Predicts the healthiness of the selected food item using deep learning-based text classification.
+* **Model**: Pre-trained BERT, fine-tuned on a binary classification task (`Healthy` vs `Unhealthy`)
+* **Input**: Food item description (text)
+* **Output**: Prediction of healthiness
+* **Example**:
 
-To summarize:
-KNN (ML) predicts nutritionally similar food items.
+  * Input: "Spicy Chicken Wrap"
+  * Output: `Unhealthy`
 
-TF-IDF and Cosine Similarity (NLP) predicts text-based similarity between food items' names.
+---
 
-BERT (DL) predicts whether the selected food item is healthy or unhealthy based on its description
+## 🔄 Combined Flow
+
+```
+             +---------------------+
+             | McDonald's Food Item|
+             +---------------------+
+                       |
+       +-----------------------------+
+       | Nutritional Vector (Protein/Fat)
+       +-----------------------------+
+                       |
+          [KNN] --> Nearest Healthy Matches
+                       |
+               ----------------------------------
+               | TF-IDF Vector (Name/Description)
+               ----------------------------------
+                               |
+       [Cosine Similarity] --> Textual Alternatives
+                               |
+               ----------------------------------
+               | Food Description Input (Text)
+               ----------------------------------
+                               |
+            [BERT Classifier] --> Health Prediction
+```
+
+---
+
+## 💻 Project Structure
+
+```bash
+McDonalds-Healthier-Alternative-Recommendation/
+│
+├── data/                   # Food datasets (McDonald's, healthy foods)
+├── models/                 # Saved BERT models / TF-IDF pickles
+├── knn_recommender.py      # KNN logic for nutritional similarity
+├── nlp_similarity.py       # TF-IDF + Cosine similarity script
+├── bert_classifier.py      # BERT fine-tuning and inference
+├── utils.py                # Data preprocessing, scaling, etc.
+├── app.py                  # Optional streamlit or flask frontend
+├── requirements.txt        # Dependencies
+└── README.md               # Project info
+```
+
+---
+
+## 📊 Example Output
+
+**Input**: `"Spicy Chicken Wrap"`
+
+| Technique       | Output                        |
+| --------------- | ----------------------------- |
+| KNN (Nutrition) | `Nuts`, `Milkshake`, `Coffee` |
+| NLP (Text)      | `Tomato`, `Banana`, `Oats`    |
+| BERT (Health)   | `Prediction: Unhealthy`       |
+
+---
+
+## ⚙️ How to Run
+
+### 1. Clone the Repo
+
+```bash
+git clone https://github.com/yourusername/McDonalds-Healthier-Alternative-Recommendation.git
+cd McDonalds-Healthier-Alternative-Recommendation
+```
+
+### 2. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run Individual Scripts
+
+**KNN Recommender**
+
+```bash
+python knn_recommender.py --item "Spicy Chicken Wrap"
+```
+
+**NLP-Based Similarity**
+
+```bash
+python nlp_similarity.py --item "Spicy Chicken Wrap"
+```
+
+**BERT Classifier**
+
+```bash
+python bert_classifier.py --description "Spicy Chicken Wrap with crispy chicken and mayo"
+```
+
+---
+
+# License
+
+This repository is proprietary and all rights are reserved. No usage, modification, or distribution is allowed without permission.
